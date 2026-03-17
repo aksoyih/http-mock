@@ -1,58 +1,109 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Aksoyih\HttpMock;
 
-class HttpMock
+use Aksoyih\HttpMock\Adapter\GuzzleHandler;
+use Aksoyih\HttpMock\Adapter\Psr18Client;
+use Aksoyih\HttpMock\Adapter\SymfonyClient;
+use Aksoyih\HttpMock\Response\ResponseBuilder;
+use Closure;
+
+final class HttpMock
 {
-    private array $mockResponses = [];
-    private ?int $delay = null;
-    private ?string $globalError = null;
+    public const int throw = MockEngine::THROW;
+    public const int DEFAULT_404 = MockEngine::DEFAULT_404;
 
-    public function when(string $method, string $url): MockBuilder
+    private static ?MockEngine $engine = null;
+
+    private function __construct()
     {
-        return new MockBuilder($this, $method, $url);
     }
 
-    public function withDelay(int $milliseconds): self
+    public static function when(string $method, string $url): ResponseBuilder
     {
-        $this->delay = $milliseconds;
-        return $this;
+        return self::engine()->when($method, $url);
     }
 
-    public function withGlobalError(string $error): self
+    public static function whenMatching(Closure $callback): ResponseBuilder
     {
-        $this->globalError = $error;
-        return $this;
+        return self::engine()->whenMatching($callback);
     }
 
-    public function reset(): void
+    /**
+     * @param array<string, array{status?: int, headers?: array<string, string|string[]>, body?: mixed}> $definitions
+     */
+    public static function fake(array $definitions): void
     {
-        $this->mockResponses = [];
-        $this->delay = null;
-        $this->globalError = null;
+        self::engine()->fake($definitions);
     }
 
-    public function addMockResponse(string $method, string $url, array $response): void
+    /**
+     * @param array<string, string|string[]> $headers
+     * @return array{status: int, headers: array<string, string|string[]>, body: mixed}
+     */
+    public static function response(mixed $body, int $status = 200, array $headers = []): array
     {
-        $this->mockResponses[$this->createKey($method, $url)] = $response;
+        return MockEngine::response($body, $status, $headers);
     }
 
-    public function getMockResponse(string $method, string $url): ?array
+    public static function createClient(): Psr18Client
     {
-        if ($this->globalError) {
-            throw new \RuntimeException($this->globalError);
+        return new Psr18Client(self::engine());
+    }
+
+    public static function createGuzzleHandler(): GuzzleHandler
+    {
+        return new GuzzleHandler(self::engine());
+    }
+
+    public static function createSymfonyClient(): SymfonyClient
+    {
+        return new SymfonyClient(self::engine());
+    }
+
+    public static function onUnmatched(int|Closure $strategy): void
+    {
+        self::engine()->onUnmatched($strategy);
+    }
+
+    public static function verify(): void
+    {
+        self::engine()->verify();
+    }
+
+    public static function assertCalled(string $method, string $url): void
+    {
+        self::engine()->assertCalled($method, $url);
+    }
+
+    public static function assertCalledTimes(string $method, string $url, int $times): void
+    {
+        self::engine()->assertCalledTimes($method, $url, $times);
+    }
+
+    public static function assertNotCalled(string $method, string $url): void
+    {
+        self::engine()->assertNotCalled($method, $url);
+    }
+
+    public static function reset(): void
+    {
+        self::$engine = null;
+    }
+
+    public static function scoped(Closure $callback): void
+    {
+        try {
+            $callback();
+        } finally {
+            self::reset();
         }
-
-        if ($this->delay) {
-            usleep($this->delay * 1000);
-        }
-
-        $key = $this->createKey($method, $url);
-        return $this->mockResponses[$key] ?? null;
     }
 
-    private function createKey(string $method, string $url): string
+    public static function engine(): MockEngine
     {
-        return strtoupper($method) . '|' . $url;
+        return self::$engine ??= new MockEngine();
     }
-} 
+}

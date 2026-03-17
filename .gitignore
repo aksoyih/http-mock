@@ -1,11 +1,19 @@
 # Composer
 /vendor/
 composer.lock
+composer.phar
+composer-setup.php
+
+# Claude Code
+.claude/
 
 # PHPUnit
 .phpunit.cache
 .phpunit.result.cache
 coverage/
+
+# PHPStan
+.phpstan.cache/
 
 # IDE
 .idea/
