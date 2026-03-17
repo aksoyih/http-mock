@@ -7,6 +7,9 @@ composer.lock
 .phpunit.result.cache
 coverage/
 
+# PHPStan
+.phpstan.cache/
+
 # IDE
 .idea/
 .vscode/
