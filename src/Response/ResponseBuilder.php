@@ -12,6 +12,7 @@ final class ResponseBuilder
 {
     private mixed $body = null;
     private int $status = 200;
+    /** @var array<string, string|string[]> */
     private array $headers = [];
     private ?int $times = null;
     private ?int $atLeast = null;
@@ -20,7 +21,8 @@ final class ResponseBuilder
     public function __construct(
         private readonly MockRegistry $registry,
         private readonly RequestMatcherInterface $matcher,
-    ) {}
+    ) {
+    }
 
     public function willReturn(mixed $body): self
     {
@@ -34,6 +36,9 @@ final class ResponseBuilder
         return $this;
     }
 
+    /**
+     * @param array<string, string|string[]> $headers
+     */
     public function withHeaders(array $headers): self
     {
         $this->headers = array_merge($this->headers, $headers);

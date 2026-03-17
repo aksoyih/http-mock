@@ -14,6 +14,7 @@ final class Expectation
     public function __construct(
         public readonly RequestMatcherInterface $matcher,
         public readonly int $status = 200,
+        /** @var array<string, string|string[]> */
         public readonly array $headers = [],
         public readonly mixed $body = null,
         public readonly ?int $times = null,

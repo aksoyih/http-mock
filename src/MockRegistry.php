@@ -38,7 +38,7 @@ final class MockRegistry
     public function describeAll(): array
     {
         return array_map(
-            fn(Expectation $e) => ['description' => $e->matcher->describe(), 'matchCount' => $e->matchCount],
+            fn (Expectation $e) => ['description' => $e->matcher->describe(), 'matchCount' => $e->matchCount],
             $this->expectations,
         );
     }

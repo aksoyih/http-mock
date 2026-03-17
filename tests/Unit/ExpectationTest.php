@@ -16,7 +16,10 @@ final class ExpectationTest extends TestCase
     {
         $matcher = new ExactMatcher('GET', '/users');
         $expectation = new Expectation(
-            matcher: $matcher, status: 200, headers: ['X-Custom' => 'value'], body: ['id' => 1],
+            matcher: $matcher,
+            status: 200,
+            headers: ['X-Custom' => 'value'],
+            body: ['id' => 1],
         );
         $this->assertSame($matcher, $expectation->matcher);
         $this->assertSame(200, $expectation->status);

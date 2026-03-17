@@ -68,7 +68,7 @@ final class HttpMockTest extends TestCase
     public function callable_matching_with_when_matching(): void
     {
         HttpMock::whenMatching(
-            fn(string $method, string $url) => $method === 'POST' && str_contains($url, '/admin'),
+            fn (string $method, string $url) => $method === 'POST' && str_contains($url, '/admin'),
         )->willReturn(['access' => 'granted'])
             ->register();
 
@@ -191,7 +191,7 @@ final class HttpMockTest extends TestCase
     #[Test]
     public function callable_unmatched_handler(): void
     {
-        HttpMock::onUnmatched(fn() => ['status' => 503, 'headers' => [], 'body' => 'down']);
+        HttpMock::onUnmatched(fn () => ['status' => 503, 'headers' => [], 'body' => 'down']);
 
         $client = HttpMock::createClient();
         $response = $client->sendRequest($this->factory->createRequest('GET', '/anything'));

@@ -22,7 +22,8 @@ final readonly class WildcardMatcher implements RequestMatcherInterface
     #[Override]
     public function matches(string $method, string $url, array $headers = [], mixed $body = null): bool
     {
-        $path = parse_url($url, PHP_URL_PATH) ?? $url;
+        $parsed = parse_url($url, PHP_URL_PATH);
+        $path = is_string($parsed) ? $parsed : $url;
         return strtoupper($method) === $this->method && preg_match($this->regex, $path) === 1;
     }
 

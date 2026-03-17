@@ -14,7 +14,8 @@ final class VerificationResult
     public function __construct(
         public private(set) bool $passed,
         public private(set) array $failures = [],
-    ) {}
+    ) {
+    }
 
     public static function check(Expectation $expectation, int $actualCount): self
     {

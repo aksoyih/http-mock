@@ -42,7 +42,7 @@ final class MockEngine
     }
 
     /**
-     * @param array<string, array{status?: int, headers?: array, body?: mixed}> $definitions
+     * @param array<string, array{status?: int, headers?: array<string, string|string[]>, body?: mixed}> $definitions
      */
     public function fake(array $definitions): void
     {
@@ -59,7 +59,8 @@ final class MockEngine
     }
 
     /**
-     * @return array{status: int, headers: array, body: mixed}
+     * @param array<string, string|string[]> $headers
+     * @return array{status: int, headers: array<string, string|string[]>, body: mixed}
      */
     public static function response(mixed $body, int $status = 200, array $headers = []): array
     {
@@ -68,7 +69,7 @@ final class MockEngine
 
     /**
      * @param array<string, string[]> $headers
-     * @return array{status: int, headers: array, body: mixed}
+     * @return array{status: int, headers: array<string, string|string[]>, body: mixed}
      */
     public function handleRequest(string $method, string $url, array $headers = [], mixed $body = null): array
     {
@@ -139,8 +140,8 @@ final class MockEngine
     }
 
     /**
-     * @param array{status: int, headers: array, body: mixed} $result
-     * @return array{status: int, headers: array, body: string}
+     * @param array{status: int, headers: array<string, string|string[]>, body: mixed} $result
+     * @return array{status: int, headers: array<string, string|string[]>, body: string}
      */
     public static function serializeResponse(array $result): array
     {
@@ -151,6 +152,10 @@ final class MockEngine
             $headers['Content-Type'] ??= 'application/json';
             $body = json_encode($body, JSON_THROW_ON_ERROR);
         } elseif ($body === null) {
+            $body = '';
+        } elseif (is_scalar($body)) {
+            $body = (string) $body;
+        } else {
             $body = '';
         }
 
@@ -186,11 +191,12 @@ final class MockEngine
     }
 
     /**
-     * @return array{status: int, headers: array, body: mixed}
+     * @return array{status: int, headers: array<string, string|string[]>, body: mixed}
      */
     private function handleUnmatched(string $method, string $url): array
     {
         if ($this->unmatchedStrategy instanceof Closure) {
+            /** @var array{status: int, headers: array<string, string|string[]>, body: mixed} */
             return ($this->unmatchedStrategy)($method, $url);
         }
         if ($this->unmatchedStrategy === self::DEFAULT_404) {

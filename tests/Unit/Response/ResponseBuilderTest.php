@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Aksoyih\HttpMock\Tests\Unit\Response;
 
 use Aksoyih\HttpMock\Matching\ExactMatcher;
-use Aksoyih\HttpMock\Matching\RequestMatcherInterface;
 use Aksoyih\HttpMock\MockRegistry;
 use Aksoyih\HttpMock\Response\ResponseBuilder;
 use PHPUnit\Framework\Attributes\Test;

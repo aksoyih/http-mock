@@ -12,12 +12,14 @@ use Closure;
 
 final class HttpMock
 {
-    public const int THROW = MockEngine::THROW;
+    public const int throw = MockEngine::THROW;
     public const int DEFAULT_404 = MockEngine::DEFAULT_404;
 
     private static ?MockEngine $engine = null;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function when(string $method, string $url): ResponseBuilder
     {
@@ -30,7 +32,7 @@ final class HttpMock
     }
 
     /**
-     * @param array<string, array{status?: int, headers?: array, body?: mixed}> $definitions
+     * @param array<string, array{status?: int, headers?: array<string, string|string[]>, body?: mixed}> $definitions
      */
     public static function fake(array $definitions): void
     {
@@ -38,7 +40,8 @@ final class HttpMock
     }
 
     /**
-     * @return array{status: int, headers: array, body: mixed}
+     * @param array<string, string|string[]> $headers
+     * @return array{status: int, headers: array<string, string|string[]>, body: mixed}
      */
     public static function response(mixed $body, int $status = 200, array $headers = []): array
     {

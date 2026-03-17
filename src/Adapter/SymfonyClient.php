@@ -16,14 +16,26 @@ final readonly class SymfonyClient implements HttpClientInterface
 {
     public function __construct(
         private MockEngine $engine,
-    ) {}
+    ) {
+    }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     #[Override]
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $headers = [];
-        foreach ($options['headers'] ?? [] as $name => $value) {
-            $headers[$name] = is_array($value) ? $value : [$value];
+        $optionHeaders = $options['headers'] ?? [];
+        if (is_array($optionHeaders)) {
+            foreach ($optionHeaders as $name => $value) {
+                $headerName = is_string($name) ? $name : (string) $name;
+                if (is_array($value)) {
+                    $headers[$headerName] = array_map(fn (mixed $v): string => is_scalar($v) ? (string) $v : '', $value);
+                } elseif (is_scalar($value)) {
+                    $headers[$headerName] = [(string) $value];
+                }
+            }
         }
 
         $body = $options['body'] ?? $options['json'] ?? null;
@@ -56,6 +68,9 @@ final readonly class SymfonyClient implements HttpClientInterface
         throw new \RuntimeException('Streaming is not supported by the mock client.');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     #[Override]
     public function withOptions(array $options): static
     {
