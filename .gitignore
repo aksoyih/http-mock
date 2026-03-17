@@ -1,6 +1,11 @@
 # Composer
 /vendor/
 composer.lock
+composer.phar
+composer-setup.php
+
+# Claude Code
+.claude/
 
 # PHPUnit
 .phpunit.cache
